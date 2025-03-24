@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { BASE_URL } from "../utils";
 
 const NoteEdit = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const NoteEdit = () => {
 
   useEffect(() => {
     const fetchNote = async () => {
-      const response = await axios.get("http://localhost:5000/notes");
+      const response = await axios.get(`${BASE_URL}/notes`);
       const note = response.data.find((n) => n.id === parseInt(id));
       if (note) {
         setJudul(note.judul);
@@ -22,7 +23,7 @@ const NoteEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.put(`http://localhost:5000/edit-note/${id}`, { judul, isi });
+    await axios.put(`${BASE_URL}/edit-note/${id}`, { judul, isi });
     navigate("/");
   };
 

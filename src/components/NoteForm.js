@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../utils";
 
 const NoteForm = () => {
   const [judul, setJudul] = useState("");
@@ -9,7 +10,7 @@ const NoteForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:5000/add-note", {
+    await axios.post(`${BASE_URL}/add-note`, {
       judul,
       isi,
     });

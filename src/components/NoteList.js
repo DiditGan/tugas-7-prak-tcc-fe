@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "../utils";
 
 const NoteList = () => {
   const [notes, setNotes] = useState([]);
@@ -10,12 +11,12 @@ const NoteList = () => {
   }, []);
 
   const fetchNotes = async () => {
-    const response = await axios.get("http://localhost:5000/notes");
+    const response = await axios.get(`${BASE_URL}/notes`);
     setNotes(response.data);
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/delete-note/${id}`);
+    await axios.delete(`${BASE_URL}/delete-note/${id}`);
     fetchNotes();
   };
 
