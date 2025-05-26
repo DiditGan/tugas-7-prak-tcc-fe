@@ -1,1 +1,1 @@
-export const BASE_URL = "https://c-04-460105.uc.r.appspot.com/register";
+export const BASE_URL = "https://tcc-be-yedhit-469569820136.us-central1.run.app/api";
