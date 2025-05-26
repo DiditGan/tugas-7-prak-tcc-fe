@@ -4,17 +4,28 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils";
 
 const NoteForm = () => {
-  const [judul, setJudul] = useState("");
-  const [isi, setIsi] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post(`${BASE_URL}/add-note`, {
-      judul,
-      isi,
-    });
-    navigate("/");
+    setErrorMsg("");
+    try {
+      await axios.post(`${BASE_URL}/notes`, {
+        title,
+        content,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      navigate("/");
+    } catch (error) {
+      setErrorMsg(error.response?.data?.msg || error.message);
+    }
   };
 
   return (
@@ -22,6 +33,7 @@ const NoteForm = () => {
       <div className="hero-body">
         <div className="container">
           <h1 className="title has-text-centered">Tambah Catatan</h1>
+          {errorMsg && <p className="has-text-danger has-text-centered">{errorMsg}</p>}
           <form onSubmit={handleSubmit}>
             <div className="field">
               <label className="label">Judul</label>
@@ -29,8 +41,8 @@ const NoteForm = () => {
                 <input
                   className="input is-medium"
                   type="text"
-                  value={judul}
-                  onChange={(e) => setJudul(e.target.value)}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
@@ -41,8 +53,8 @@ const NoteForm = () => {
               <div className="control">
                 <textarea
                   className="textarea is-medium"
-                  value={isi}
-                  onChange={(e) => setIsi(e.target.value)}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
                   required
                 ></textarea>
               </div>

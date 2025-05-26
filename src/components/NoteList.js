@@ -5,19 +5,39 @@ import { BASE_URL } from "../utils";
 
 const NoteList = () => {
   const [notes, setNotes] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     fetchNotes();
+    // eslint-disable-next-line
   }, []);
 
   const fetchNotes = async () => {
-    const response = await axios.get(`${BASE_URL}/notes`);
-    setNotes(response.data);
+    try {
+      const response = await axios.get(`${BASE_URL}/notes`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setNotes(response.data);
+      setErrorMsg("");
+    } catch (error) {
+      setErrorMsg(error.response?.data?.msg || "Error fetching notes");
+    }
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`${BASE_URL}/delete-note/${id}`);
-    fetchNotes();
+    try {
+      await axios.delete(`${BASE_URL}/notes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      fetchNotes();
+    } catch (error) {
+      setErrorMsg(error.response?.data?.msg || "Error deleting note");
+    }
   };
 
   return (
@@ -26,12 +46,14 @@ const NoteList = () => {
         <div className="container">
           <h1 className="title has-text-centered">Daftar Catatan</h1>
           <h2 className="subtitle has-text-centered">Kelola catatanmu dengan mudah</h2>
-          <div className="has-text-centered">
-            <Link to="/add" className="button is-primary is-large mb-5">
-              Tambah Catatan
-            </Link>
-          </div>
-
+          {token && (
+            <div className="has-text-centered">
+              <Link to="/add" className="button is-primary is-large mb-5">
+                Tambah Catatan
+              </Link>
+            </div>
+          )}
+          {errorMsg && <p className="has-text-danger has-text-centered">{errorMsg}</p>}
           {notes.length === 0 ? (
             <p className="has-text-centered">Tidak ada catatan</p>
           ) : (
@@ -40,23 +62,25 @@ const NoteList = () => {
                 <div key={note.id} className="column is-one-third">
                   <div className="card">
                     <div className="card-content">
-                      <p className="title is-4">{note.judul}</p>
-                      <p className="content">{note.isi}</p>
+                      <p className="title is-4">{note.title}</p>
+                      <p className="content">{note.content}</p>
                     </div>
-                    <footer className="card-footer">
-                      <Link
-                        to={`/edit/${note.id}`}
-                        className="card-footer-item has-text-info"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        className="card-footer-item has-text-danger"
-                        onClick={() => handleDelete(note.id)}
-                      >
-                        Hapus
-                      </button>
-                    </footer>
+                    {token && (
+                      <footer className="card-footer">
+                        <Link
+                          to={`/edit/${note.id}`}
+                          className="card-footer-item has-text-info"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          className="card-footer-item has-text-danger"
+                          onClick={() => handleDelete(note.id)}
+                        >
+                          Hapus
+                        </button>
+                      </footer>
+                    )}
                   </div>
                 </div>
               ))}
